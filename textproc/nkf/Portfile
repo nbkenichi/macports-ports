@@ -1,9 +1,12 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
+PortGroup           github 1.0
 
 name                nkf
-version             2.1.5
+github.setup        nurse nkf 2_1_5 v
+github.tarball_from archive
+version             [string map {_ .} ${github.version}]
 categories          textproc japanese
 maintainers         nomaintainer
 description         Network Kanji code conversion filter
@@ -13,14 +16,11 @@ long_description    Nkf is a yet another kanji code converter among networks, ho
                     Users, generally, need not set the input code explicitly.
 platforms           darwin
 license             zlib
-homepage            https://osdn.net/projects/nkf/
-master_sites        http://gigenet.dl.osdn.jp/nkf/70406
+homepage            https://github.com/nurse/nkf
 
-dist_subdir         nkf
-
-checksums           rmd160  0c41198eda7361f797439b6e3a590cb767d63498 \
-                    sha256  d1a7df435847a79f2f33a92388bca1d90d1b837b1b56523dcafc4695165bad44 \
-                    size    215879
+checksums           rmd160  103306c344a68a9ac9f8996b1f33eee762aff04d \
+                    sha256  10cf6eb3d4d095919185ac224d5a634e9926d731e656d04bacb270e5cae0e28c \
+                    size    250895
 
 use_configure       no
 
@@ -38,6 +38,4 @@ destroot {
     xinstall -m 644 ${worksrcpath}/nkf.doc ${destroot}${prefix}/share/doc/${name}
 }
 
-livecheck.type      regex
-livecheck.url       ${homepage}
-livecheck.regex     nkf (\[0-9.a-z\]+)
+github.livecheck.regex {([0-9_]+)}
