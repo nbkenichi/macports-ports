@@ -10,7 +10,7 @@ conflicts           isl-devel
 # (e.g. port file all | sort -u | xargs grep -E ':isl( |$)' | cut -d / -f 13 | sort -u)
 # see https://lists.macports.org/pipermail/macports-dev/2019-May/040678.html
 epoch               4
-version             0.24
+version             0.27
 revision            1
 
 categories          devel math
@@ -37,9 +37,9 @@ depends_lib         port:gmp
 master_sites        sourceforge:libisl
 use_bzip2           yes
 
-checksums           rmd160  b3bf8e1ad50207d4eebecc47cb4cffdac6581a57 \
-                    sha256  fcf78dd9656c10eb8cf9fbd5f59a0b6b01386205fe1934b3b287a0a1898145c0 \
-                    size    2261594
+checksums           rmd160  95056c9e98142c02a8884873502a6ad644da98e0 \
+                    sha256  626335529331f7c89fec493de929e2e92fb3d8cc860fc7af554e0518ee0029ee \
+                    size    2417649
 
 configure.args      --disable-silent-rules
 
