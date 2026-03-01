@@ -1,0 +1,149 @@
+diff --git macosx/AppDelegate.m macosx/AppDelegate.m
+index fe8173f..f4c0226 100644
+--- macosx/AppDelegate.m
++++ macosx/AppDelegate.m
+@@ -25,6 +25,9 @@
+ #import "KeychainSupport.h"
+ #import "NSStringExtensions.h"
+ 
++#import <dispatch/dispatch.h>
++#import <Foundation/Foundation.h>
++#import <LocalAuthentication/LocalAuthentication.h>
+ 
+ @implementation AppDelegate
+ 
+@@ -186,9 +189,44 @@ static int mac_cmd_handler (pinentry_t pe) {
+ 			NSString *passphraseFromKeychain = getPassphraseFromKeychain(cacheId, &doNotUseKeychain);
+ 			const char *passphrase = passphraseFromKeychain.UTF8String;
+ 			if (passphrase && passphraseFromKeychain.length) { // A non-empty password was found.
++				// NSString *keyinfo = [NSString gpgStringWithCString:pe->keyinfo];
++				NSDictionary *userData = parseUserData(pe);
++				NSString *description = userData[@"description"];
++				//				printf("descriptionText %s\n", description.UTF8String);
++				//				printf("keyinfo.UTF8String %s\n", keyinfo.UTF8String);
++				//				printf("passphraseFromKeychain.UTF8String %s\n", passphrase);
++				__block int result = 1;
++
++				@autoreleasepool {
++				  //				  NSString *reason = description;
++				  NSString *reason = [description stringByReplacingOccurrencesOfString: @"Please enter the passphrase to " withString: @""];
++				  LAContext *context = [[LAContext alloc] init];
++				  dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
++				  [context evaluatePolicy: kLAPolicyDeviceOwnerAuthentication localizedReason: reason
++						    reply:^(BOOL success, NSError * _Nullable error) {
++				      if (success) {
++					result = 0;
++				      }
++				      else {
++					NSLog(@"%s\n", error.localizedDescription.UTF8String);
++					result = 1;
++				      }
++				      dispatch_semaphore_signal(semaphore);
++				    }];
++				  dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
++				  //				  printf("reuslt %d\n", result);
++				} // end of autoreleasepool
++
+ 				int len = strlen(passphrase);
++				if (result == 1) {
++				  passphrase = nil;
++				  len = 0;
++				}
+ 				pinentry_setbufferlen(pe, len + 1);
+-				if (pe->pin) {
++
++				if (result == 1) {
++				  //				  printf("touch id cancel\n", result);
++				} else if (pe->pin) {
+ 					lastCacheIdUsed = cacheId;
+ 
+ 					// Write the password into pe->pin and return its length.
+diff --git macosx/Info.plist macosx/Info.plist
+index eb352ac..f494a27 100755
+--- macosx/Info.plist
++++ macosx/Info.plist
+@@ -7,15 +7,15 @@
+ 	<key>CFBundleDevelopmentRegion</key>
+ 	<string>English</string>
+ 	<key>CFBundleExecutable</key>
+-	<string>pinentry-mac</string>
++	<string>pinentry-mac-touchid</string>
+ 	<key>CFBundleIconFile</key>
+ 	<string>Icon</string>
+ 	<key>CFBundleIdentifier</key>
+-	<string>org.gpgtools.pinentry-mac</string>
++	<string>org.gpgtools.pinentry-mac-touchid</string>
+ 	<key>CFBundleInfoDictionaryVersion</key>
+ 	<string>6.0</string>
+ 	<key>CFBundleName</key>
+-	<string>pinentry-mac</string>
++	<string>pinentry-mac-touchid</string>
+ 	<key>CFBundlePackageType</key>
+ 	<string>APPL</string>
+ 	<key>CFBundleShortVersionString</key>
+diff --git macosx/Makefile.am macosx/Makefile.am
+index bc360f3..5a6dddb 100644
+--- macosx/Makefile.am
++++ macosx/Makefile.am
+@@ -1,5 +1,5 @@
+-noinst_PROGRAMS = pinentry-mac
+-libexec_PROGRAMS = pinentry-mac.app
++noinst_PROGRAMS = pinentry-mac-touchid
++libexec_PROGRAMS = pinentry-mac-touchid.app
+ 
+ if FALLBACK_CURSES
+ ncurses_include = $(NCURSES_INCLUDE)
+@@ -9,14 +9,14 @@ ncurses_include =
+ libcurses =
+ endif
+ 
+-FRAMEWORKS = -framework Cocoa -framework Security
++FRAMEWORKS = -framework Cocoa -framework Security -framework LocalAuthentication
+ AM_LDFLAGS = $(FRAMEWORKS) -Wl,-rpath,@executable_path/../Frameworks
+ 
+ AM_OBJCFLAGS = $(COMMON_CFLAGS) $(ncurses_include) -I$(top_srcdir)/secmem -I$(top_srcdir)/pinentry -fobjc-arc
+ LDADD = ../pinentry/libpinentry.a ../secmem/libsecmem.a \
+ 	$(COMMON_LIBS) $(LIBCAP) $(libcurses)
+ 
+-pinentry_mac_SOURCES = KeychainSupport.m NSStringExtensions.m PinentryMac.m \
++pinentry_mac_touchid_SOURCES = KeychainSupport.m NSStringExtensions.m PinentryMac.m \
+ 	ShortcutHandlingFields.m PassphraseLengthFormatter.m AppDelegate.m main.m
+ 
+ app_RESOURCES = Icon.icns
+@@ -29,7 +29,7 @@ app_RES = $(app_NIBS) $(app_LPROJS) $(app_RESOURCES)
+ 
+ CLEANFILES = $(app_NIBS)
+ 
+-temp_app_dir = pinentry-mac.app_temp
++temp_app_dir = pinentry-mac-touchid.app_temp
+ contents_dir = $(temp_app_dir)/Contents
+ 
+ 
+@@ -48,10 +48,10 @@ clean-local:
+ clean-libexecPROGRAMS:
+ 	[[ -z "$(libexec_PROGRAMS)" ]] || rm -rf $(libexec_PROGRAMS)
+ 
+-pinentry-mac.app$(EXEEXT): pinentry-mac $(app_RES) Info.plist
+-	@rm -rf pinentry-mac.app $(temp_app_dir)
++pinentry-mac-touchid.app$(EXEEXT): pinentry-mac-touchid $(app_RES) Info.plist
++	@rm -rf pinentry-mac-touchid.app $(temp_app_dir)
+ 	mkdir -p $(contents_dir)/MacOS $(contents_dir)/Resources
+ 	cp -R $(app_RES) $(contents_dir)/Resources/
+ 	./copyInfoPlist.sh Info.plist $(contents_dir)
+-	cp pinentry-mac $(contents_dir)/MacOS/
+-	mv $(temp_app_dir) pinentry-mac.app
++	cp pinentry-mac-touchid $(contents_dir)/MacOS/
++	mv $(temp_app_dir) pinentry-mac-touchid.app
+diff --git macosx/main.m macosx/main.m
+index 4c7999a..1cd7b51 100755
+--- macosx/main.m
++++ macosx/main.m
+@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
+ 		}
+ #endif
+ 
+-		pinentry_init("pinentry-mac");
++		pinentry_init("pinentry-mac-touchid");
+ 
+ 		/* Consumes all arguments.  */
+ 		pinentry_parse_opts(argc, argv);
