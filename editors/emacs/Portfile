@@ -287,8 +287,14 @@ if {$subport eq "emacs-app" || $subport eq "emacs-app-devel"} {
 
     patchfiles-append   patch-Info.plist.in.diff
 
+    variant inline description {Use inline patch} {
+        patchfiles-append   emacs-29.1-inline.patch
+    }
+    default_variants-append     +inline
+    
     post-patch {
         reinplace "s,@PATH@,${prefix}/bin:${prefix}/sbin:/usr/bin:/bin:/usr/sbin:/sbin," ${worksrcpath}/nextstep/templates/Info.plist.in
+        file copy -force ${filespath}/EmacsLG1-Default.icns ${worksrcpath}/nextstep/Cocoa/Emacs.base/Contents/Resources/Emacs.icns
     }
 
     destroot {
