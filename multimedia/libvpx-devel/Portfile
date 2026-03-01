@@ -6,7 +6,7 @@ PortGroup           muniversal 1.0
 name                libvpx-devel
 conflicts           libvpx
 set my_name         libvpx
-version             1.15.2
+version             1.16.0
 revision            0
 
 categories          multimedia
@@ -36,7 +36,6 @@ git.url             https://chromium.googlesource.com/webm/${my_name}
 git.branch          v${version}
 
 patchfiles-append   patch-Makefile.diff
-patchfiles-append   patch-configure.sh.diff
 patchfiles-append   patch-vpx_ports.diff
 
 # requires c++11 https://trac.macports.org/ticket/67038
