@@ -405,3 +405,20 @@ default_variants-append     +treesitter
 if {${configure.build_arch} ni [list i386 ppc]} {
     default_variants-append +nativecomp
 }
+
+variant inline description {Use inline patch} {
+    if {$subport eq $name || $subport eq "emacs-app"} {
+        post-patch {
+            system "cd ${worksrcpath} && patch -p1 < ${filespath}/emacs-29.1-inline.patch"
+        }
+    } else {
+        post-patch {
+            system "cd ${worksrcpath} && patch -p1 < ${filespath}/emacs-head-inline.patch"
+        }
+    }
+}
+default_variants-append     +inline
+
+post-patch {
+    file copy -force ${filespath}/EmacsLG1-Default.icns ${worksrcpath}/nextstep/Cocoa/Emacs.base/Contents/Resources/Emacs.icns
+}
