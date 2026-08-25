@@ -409,7 +409,7 @@ if {${configure.build_arch} ni [list i386 ppc]} {
 variant inline description {Use inline patch} {
     if {$subport eq $name || $subport eq "emacs-app"} {
         post-patch {
-            system "cd ${worksrcpath} && patch -p1 < ${filespath}/emacs-29.1-inline.patch"
+            system "cd ${worksrcpath} && patch -p1 < ${filespath}/emacs-31.1-inline.patch"
         }
     } else {
         post-patch {
