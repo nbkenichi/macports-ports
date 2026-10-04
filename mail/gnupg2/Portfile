@@ -8,14 +8,14 @@ legacysupport.newest_darwin_requires_legacy 13
 
 set my_name         gnupg
 name                ${my_name}2
-version             2.5.21
+version             2.5.24
 revision            0
 
 # Putting the SHA1 hash because that is published on the website
-checksums           rmd160  c176b27e9924bd62a2e6c115c0a18df339e3bc8e \
-                    sha1    51fae4f4d902787624eb7047f6d3e7c263ad7690 \
-                    sha256  e3af2c8caa46a66a9329fa7c6880af260451914d819595beabc2c26597b31352 \
-                    size    8351785
+checksums           rmd160  7e100d698cf6fdd1050c518c1a6a001d18cd1ad9 \
+                    sha1    61949c7a9edb5d9af9682183473b71c8319f1b79 \
+                    sha256  bf149d01a2b9fcc0e4589b8ae8697d3d5c557ea48ed95a3fa55dd3b1187e6039 \
+                    size    8431157
 
 # https://trac.macports.org/ticket/63552
 epoch               1
