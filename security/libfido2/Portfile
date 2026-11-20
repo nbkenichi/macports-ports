@@ -83,6 +83,6 @@ configure.args-append \
                     -DBUILD_STATIC_LIBS=ON \
                     -DBUILD_TESTS=ON \
                     -DBUILD_TOOLS=ON \
-                    -DUSE_HIDAPI=OFF
-
+                    -DUSE_HIDAPI=OFF \
+                    -DUSE_PCSC=ON
 test.run            yes
