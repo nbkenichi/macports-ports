@@ -85,4 +85,8 @@ configure.args-append \
                     -DBUILD_TOOLS=ON \
                     -DUSE_HIDAPI=OFF
 
+variant pcsc description "Enable experimental PCSC support" {
+    configure.args-append -DUSE_PCSC=ON
+}
+
 test.run            yes
