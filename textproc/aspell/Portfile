@@ -3,11 +3,11 @@
 PortSystem              1.0
 
 name                    aspell
-version                 0.60.8.2
+version                 0.60.8.3
 revision                0
-checksums               rmd160  01f04348a9264417f19f9f18a572b9bf195e18c9 \
-                        sha256  57fe4863eae6048f72245a8575b44b718fb85ca14b9f8c0afc41b254dfd76919 \
-                        size    3582264
+checksums               rmd160  f65c592e545a4eb46e0063dc6521885c40f4beb1 \
+                        sha256  0534eae11132405120d11e46bf595bd5dd189bc124ba77a5dd6aae861b48a162 \
+                        size    3616417
 
 set branch              [join [lrange [split ${version} .] 0 1] .]
 categories              textproc
